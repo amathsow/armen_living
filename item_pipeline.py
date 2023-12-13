@@ -6,7 +6,7 @@ import os
 import streamlit as st
 import datetime
 import statsmodels.api as sm
-from prettytable import PrettyTable
+#from prettytable import PrettyTable
 import pandas as pd
 import re
 import heapq
