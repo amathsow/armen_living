@@ -94,7 +94,7 @@ def data_item_out_stock(sales,df_stock, item):
     data_stock = df_stock[['Item No.', 'Quantity on Hand']]
     filtered_data = filter_rows_by_value(data_stock, 'Item No.', item)
     sales["sum"] = sales['mean'].cumsum().round()
-    total_quantity_item1 = filtered_data.iloc[-1]['Quantity on Hand']
+    total_quantity_item1 = filtered_data.iloc[0]['Quantity on Hand']
     if total_quantity_item1 <= 0: 
         return f"The item {item} is out of stock"
     else:
