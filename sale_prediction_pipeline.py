@@ -9,7 +9,7 @@ import plotly.express as px
 import re
 import matplotlib.pyplot as plt
 import plotly.express as px
-from fbprophet import Prophet
+from prophet import Prophet
 from fbprophet.plot import plot_plotly
 import plotly.offline as py
 
