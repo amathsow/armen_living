@@ -10,7 +10,7 @@ import re
 import matplotlib.pyplot as plt
 import plotly.express as px
 from prophet import Prophet
-from fbprophet.plot import plot_plotly
+from prophet.plot import plot_plotly
 import plotly.offline as py
 
 plt.style.use('fivethirtyeight')
