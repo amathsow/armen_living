@@ -1,0 +1,4 @@
+statsmodels
+pandas
+matplotlib
+matplotlib-inline
