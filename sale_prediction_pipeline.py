@@ -5,8 +5,13 @@ import math
 import os
 import statsmodels.api as sm
 import pandas as pd
+import plotly.express as px
 import re
 import matplotlib.pyplot as plt
+import plotly.express as px
+from fbprophet import Prophet
+from fbprophet.plot import plot_plotly
+import plotly.offline as py
 
 plt.style.use('fivethirtyeight')
 #matplotlib.rcParams['axes.labelsize']=14
@@ -17,22 +22,26 @@ plt.style.use('fivethirtyeight')
 def plot_trend_item(item_df, column,item_number):
     filtered_data = filter_rows_by_value(item_df, column, item_number)
     #plt.figure(figsize=(20, 8))
-    plt.plot(sorted(pd.to_datetime(filtered_data['Posting Date'])), filtered_data['Quantity'],color='r', label='Sale Trend')
-    plt.gcf().autofmt_xdate()
-    plt.xlabel("Date") 
-    plt.ylabel("Quantity Sales") 
-    plt.title(f"Quanity sales by item No = {filtered_data.iloc[0]['Item No.']}")
-    plt.legend() 
+    fig = px.line(filtered_data,sorted(pd.to_datetime(filtered_data['Posting Date'])), filtered_data['Quantity'])
+    #plt.gcf().autofmt_xdate()
+    #plt.xlabel("Date") 
+    #plt.ylabel("Quantity Sales") 
+    #plt.title(f"Quanity sales by item No = {filtered_data.iloc[0]['Item No.']}")
+    #plt.legend()
+    fig.update_traces(line_color='#4c963c', line_width=3)
+    return fig 
 
 def plot_trend_sales(sales):
     filtered_data = sales
     #plt.figure(figsize=(20, 8))
-    plt.plot(sorted(pd.to_datetime(filtered_data['Posting Date'])), filtered_data['Quantity'],color='g', label='Total Sale Trend')
-    plt.gcf().autofmt_xdate()
-    plt.xlabel("Date") 
-    plt.ylabel("Quantity Sales") 
-    plt.title("Total sales by day")
-    plt.legend() 
+    fig = px.line(filtered_data,pd.to_datetime(filtered_data['Posting Date']), filtered_data['Quantity'])
+    fig.update_traces(line_color='#42b5bd', line_width=3)
+    #plt.gcf().autofmt_xdate()
+    #plt.xlabel("Date") 
+    #plt.ylabel("Quantity Sales") 
+    #plt.title("Total sales by day")
+    #plt.legend() 
+    return fig
 
 def filter_rows_by_value(dataframe, column_name, value):
     """
@@ -82,21 +91,27 @@ def df_preprocess(data_path):
 
     return sales
 
+## income after sale by item
+def price_sale_item(price_sale,item):
+    price_sale = price_sale[['No.','Unit Price']]
+    price_sale = filter_rows_by_value(price_sale, 'No.', item)
+    return price_sale['Unit Price'].values[0]
+
 ## function forecast sale by item
 def forcaste_sale_by_item(item_df, column,item_number):
     sale_forcast = filter_rows_by_value(item_df, column, item_number)
-    sale_forcast = item_df[['Posting Date','Quantity']]
+    sale_forcast = sale_forcast[['Posting Date','Quantity']]
     sale_forcast['Posting Date'] = pd.to_datetime(sale_forcast['Posting Date'])
 
     #sale_forcast = sale_forcast.groupby("Posting Date")['Quantity'].sum().reset_index()
     sale_forcast.set_index("Posting Date", inplace = True)
 
-    y = sale_forcast["Quantity"].resample('D').mean() #MS mean Month Star
+    y = sale_forcast["Quantity"].resample('D').sum() #MS mean Month Star
     
 
     mod = sm.tsa.statespace.SARIMAX(y,
-                                order=(1, 1, 1),
-                                seasonal_order=(1, 1, 0, 12),
+                                order=(0, 1, 0),
+                                seasonal_order=(0, 0, 0, 0),
                                 enforce_stationarity=False,
                                 enforce_invertibility=False)
     results = mod.fit()
@@ -115,5 +130,41 @@ def forcaste_sale_by_item(item_df, column,item_number):
     return pred_ci    
 
 
+## function forecast sale by item
+def forcaste_sale_prophet_item(sales, column,item_number):
+    sale_forcast = filter_rows_by_value(sales, column, item_number)
+    sale_forcast = sale_forcast[['Posting Date','Quantity']]
+    sale_forcast['Posting Date'] = pd.to_datetime(sale_forcast['Posting Date'])
+    if sale_forcast.empty or len(sale_forcast)==1:
+        result = f"The item is out of stock, there is no trend data to predict sales"
+        return result, False
+    else:
+        sale_forcast = sale_forcast.groupby("Posting Date")['Quantity'].sum().reset_index()
+        sale_forcast.set_index("Posting Date", inplace = True)
+        y = sale_forcast["Quantity"].resample('W').sum()
+        y = y.reset_index()
+        print(y)
+
+        sale_forcast = y.rename(columns={'Posting Date': 'ds','Quantity': 'y'})
+    
+        my_model = Prophet()
+        my_model.fit(sale_forcast)
+        future_dates = my_model.make_future_dataframe(periods=52, freq='W')
+        #future_dates = pd.DataFrame({'ds':['2023-12-06','2023-12-07','2023-12-08','2023-12-09','2023-12-10','2023-12-11','2023-12-12']})
+        forecast = my_model.predict(future_dates)
+        fig = plot_plotly(my_model, forecast) # This returns a plotly Figure
+        #py.iplot(fig)
+        result = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+        result = result.sort_values(by='ds',ascending=True)
+        mask = (result['ds'] >= '2023-12-08 00:00:00' )
+        #mask = (result['ds'] > '2023-12-05 00:00:00') & (result['ds'] <= '2023-12-30 00:00:00')
+        final = result.loc[mask]
+        return final, fig
+    
+      
+    
+      
+    
+      
 
 
