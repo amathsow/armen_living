@@ -2,3 +2,4 @@ statsmodels
 pandas
 matplotlib
 matplotlib-inline
+plotly
