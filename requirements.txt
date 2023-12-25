@@ -3,4 +3,4 @@ pandas
 matplotlib
 matplotlib-inline
 plotly
-prophet
+fbprophet
