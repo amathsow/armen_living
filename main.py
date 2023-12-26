@@ -99,8 +99,8 @@ if button and 'executed_flag' not in st.session_state:
 
     week_sales = mean_sales['yhat'].iloc[0].round()
     price_sale_item = price_sale_item(price_sale,x_axis)
-    all_item_out_stock.to_csv('out_of_stock.csv', index=False) 
     all_item_out_stock = all_item_out_of_stock_day(mean_sales,df_sales,df_inventory)
+    all_item_out_stock.to_csv('out_of_stock.csv', index=False) 
     #st.session_state.executed_flag = True
     container0 = st.container()
     col1, col2 = st.columns(2)
