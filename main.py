@@ -124,7 +124,7 @@ with container1:
     with col1:
         #scatter_fig
         fig2.update_layout(
-              title= f'Sales Trend for Item: {x_axis}',
+              title= f'Monthly sales Trend for Item: {x_axis}',
               xaxis_title='Date',
               yaxis_title='Quantity sales',
               )
