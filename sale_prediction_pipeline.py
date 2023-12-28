@@ -38,6 +38,11 @@ def plot_trend_item(item_df, column,item_number):
 
 def plot_trend_sales(sales):
     filtered_data = sales
+    filtered_data['Posting Date']= pd.to_datetime(filtered_data['Posting Date'])
+    filtered_data = filtered_data.groupby("Posting Date")['Quantity'].sum().reset_index()
+    filtered_data.set_index("Posting Date", inplace = True)
+    filtered_data = filtered_data["Quantity"].resample('M').sum()
+    filtered_data = filtered_data.reset_index()
     #plt.figure(figsize=(20, 8))
     fig = px.line(filtered_data,pd.to_datetime(filtered_data['Posting Date']), filtered_data['Quantity'])
     fig.update_traces(line_color='#42b5bd', line_width=3)
