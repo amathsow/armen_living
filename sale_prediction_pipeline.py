@@ -21,6 +21,11 @@ plt.style.use('fivethirtyeight')
 
 def plot_trend_item(item_df, column,item_number):
     filtered_data = filter_rows_by_value(item_df, column, item_number)
+    filtered_data['Posting Date']= pd.to_datetime(filtered_data['Posting Date'])
+    filtered_data = filtered_data.groupby("Posting Date")['Quantity'].sum().reset_index()
+    filtered_data.set_index("Posting Date", inplace = True)
+    filtered_data = filtered_data["Quantity"].resample('M').sum()
+    filtered_data = filtered_data.reset_index()
     #plt.figure(figsize=(20, 8))
     fig = px.line(filtered_data,sorted(pd.to_datetime(filtered_data['Posting Date'])), filtered_data['Quantity'])
     #plt.gcf().autofmt_xdate()
