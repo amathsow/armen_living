@@ -61,6 +61,10 @@ def get_data_inventory(path):
 def plot_trend_item_stock(item_df, column,item_number):
     filtered_data = filter_rows_by_value(item_df, column, item_number)
     filtered_data['Date']= pd.to_datetime(filtered_data['Date'])
+    filtered_data = filtered_data.groupby("Date")['Quantity on Hand'].sum().reset_index()
+    filtered_data.set_index("Date", inplace = True)
+    filtered_data = filtered_data["Quantity on Hand"].resample('M').sum()
+    filtered_data = filtered_data.reset_index()
     
     #plt.figure(figsize=(20, 8))
     fig1 = px.line(filtered_data,sorted(filtered_data['Date']), filtered_data['Quantity on Hand'])
