@@ -151,7 +151,7 @@ def forcaste_sale_prophet_item(sales, column,item_number):
     else:
         sale_forcast = sale_forcast.groupby("Posting Date")['Quantity'].sum().reset_index()
         sale_forcast.set_index("Posting Date", inplace = True)
-        y = sale_forcast["Quantity"].resample('W').sum()
+        y = sale_forcast["Quantity"].resample('M').sum()
         y = y.reset_index()
         print(y)
 
@@ -159,7 +159,7 @@ def forcaste_sale_prophet_item(sales, column,item_number):
     
         my_model = Prophet()
         my_model.fit(sale_forcast)
-        future_dates = my_model.make_future_dataframe(periods=52, freq='W')
+        future_dates = my_model.make_future_dataframe(periods=3, freq='M')
         #future_dates = pd.DataFrame({'ds':['2023-12-06','2023-12-07','2023-12-08','2023-12-09','2023-12-10','2023-12-11','2023-12-12']})
         forecast = my_model.predict(future_dates)
         fig = plot_plotly(my_model, forecast) # This returns a plotly Figure
