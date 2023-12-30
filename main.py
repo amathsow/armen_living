@@ -92,23 +92,24 @@ if x_axis:
         if item_out_stock=="okay":
             item_out_stock = f"the item {x_axis} has {mean_sales['yhat'].iloc[0].round()} and will be out of stock during the week {mean_sales['ds'].iloc[0]}"
 
-
+week_sales = mean_sales['yhat'].iloc[0].round()
+price_sale_item = price_sale_item(price_sale,x_axis)
+container0 = st.container()
+col1, col2 = st.columns(2)
+with container0:
+    with col1:
+        col1.metric(str(mean_sales['ds'].iloc[0]),"Total weekly sales", week_sales)
+    with col2:
+        col2.metric(x_axis, "Revenue", price_sale_item*week_sales)
 #all_item_out_stock = all_item_out_of_stock_day(mean_sales,df_inventory)
 
 if button and 'executed_flag' not in st.session_state:
 
-    week_sales = mean_sales['yhat'].iloc[0].round()
-    price_sale_item = price_sale_item(price_sale,x_axis)
+
     all_item_out_stock = all_item_out_of_stock_day(mean_sales,df_sales,df_inventory)
     all_item_out_stock.to_csv('out_of_stock.csv', index=False) 
     st.session_state.executed_flag = True
-    container0 = st.container()
-    col1, col2 = st.columns(2)
-    with container0:
-        with col1:
-            col1.metric(str(mean_sales['ds'].iloc[0]),"Total weekly sales", week_sales)
-        with col2:
-            col2.metric(x_axis, "Revenue", price_sale_item*week_sales)
+
 
 
 #if 'executed_flag' not in st.session_state:
