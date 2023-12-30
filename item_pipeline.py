@@ -125,27 +125,17 @@ def all_item_out_of_stock_day(mean_sales,sales,df_item):
             filtered_data = filter_rows_by_value(df_item, 'Item No.', item)
             value = filtered_data.iloc[0]['Quantity on Hand']
             if value in results:
-                results[value].append(item)
+                results[item].append([value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]])
             else:
-                results[value] = [item] 
+                results[item] = [value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]] 
 
-    results = pd.DataFrame(dict([ (k,pd.Series(v)) for k,v in results.items() ]))
-    #print(result)
-    # Find the maximum length among all values
-    #max_length = max(len(v) if isinstance(v, list) else 1 for v in results.values())
+    # Create an empty DataFrame with desired columns
+    df = pd.DataFrame(columns=["item_number","Date" ,"Quantity on stock", "Sale Pred", "Min Sale Pred","Max Sale Pred"])
 
-    # Pad the lists with empty strings to make them of equal length
-    #for key, value in results.items():
-    #    if isinstance(value, list):
-    #        results[key] += [''] * (max_length - len(value))
+    # Iterate over the dictionary items and add rows to the DataFrame
+    for key, values in results.items():
+        if len(values) == 5:  # Assuming each list has quantity stock, sales pred, max and min sales pred
+            df = df.append({'item_number': key,'Date': values[1] ,'Quantity on stock': values[0], 'Sale Pred': values[2], 'Min Sale Pred': values[3],'Max Sale Pred': values[4] }, ignore_index=True)
 
-    # Create a PrettyTable
-    #table = PrettyTable(result.keys())
-
-    # Add rows to the table
-    #for i in range(max_length):
-    #    table.add_row([result[key][i] for key in result.keys()])
-
-    # Display the table
-    return results 
+    return df
     
