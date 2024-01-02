@@ -108,7 +108,7 @@ def data_item_out_stock(sales,df_stock, item):
             #result = f"the item {item} will be out of stock during the week {sales['ds'].iloc[0]}"
             return "okay"
         else:
-            result = f"The item {item} wont be out of stock during the week {sales['ds'].iloc[0]}"
+            result = f"The item {item} wont be out of stock during the week {sales['ds'].iloc[0]} and there are {total_quantity_item} item available"
             return result   
 
 
