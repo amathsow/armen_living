@@ -191,7 +191,7 @@ if button:
     color: green;
     }}
     </style>
-    <p class="a">All items out of stock by day during the week</p>
+    <p class="a">All items out of stock by day during the Month</p>
     """
     with container3:
         with col5:
