@@ -127,7 +127,7 @@ def all_item_out_of_stock_day(sales,df_item):
     filtered_df = grouped_sales.filter(lambda x: len(x) >= 10)
     nb_items = filtered_df['Item No.'].unique()
     
-    for item in nb_items[:100]:
+    for item in nb_items[:500]:
         mean_sales= forcaste_sale_prophet_item1(sales,"Item No.",item)
         if not isinstance(mean_sales, str):
             mean_sales = pd.DataFrame(mean_sales)
