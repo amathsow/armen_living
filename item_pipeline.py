@@ -12,7 +12,7 @@ import re
 import heapq
 import plotly.express as px
 import matplotlib.pyplot as plt
-from sale_prediction_pipeline import filter_rows_by_value
+from sale_prediction_pipeline import filter_rows_by_value,forcaste_sale_prophet_item, forcaste_sale_prophet_item1
 plt.style.use('fivethirtyeight')
 #matplotlib.rcParams['axes.labelsize']=14
 #matplotlib.rcParams['xtick.labelsize']=12
@@ -113,21 +113,31 @@ def data_item_out_stock(sales,df_stock, item):
 
 
 @st.cache_data
-def all_item_out_of_stock_day(mean_sales,sales,df_item):
-    global results
+def all_item_out_of_stock_day(sales,df_item):
     df_item = df_item[['Item No.', 'Quantity on Hand']]
-    
     results = {}
-    for item in df_item['Item No.'].unique():
-        row_sales_item = filter_rows_by_value(sales, 'Item No.', item)
-        result = data_item_out_stock(mean_sales,df_item, item)
-        if result=="okay" and len(row_sales_item)>=2:
-            filtered_data = filter_rows_by_value(df_item, 'Item No.', item)
-            value = filtered_data.iloc[0]['Quantity on Hand']
-            if value in results:
-                results[item].append([value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]])
-            else:
-                results[item] = [value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]] 
+    sales['Posting Date'] = pd.to_datetime(sales['Posting Date'])
+    # Group by 'item No' and the month of the 'date'
+    grouped_sales = sales.groupby(['Item No.', sales['Posting Date'].dt.month])
+    # Filter items with at least 2 rows per month
+    filtered_df = grouped_sales.filter(lambda x: len(x) >= 10)
+    nb_items = filtered_df['Item No.'].unique()
+    
+    for item in nb_items[:100]:
+        mean_sales= forcaste_sale_prophet_item1(sales,"Item No.",item)
+        if not isinstance(mean_sales, str):
+            mean_sales = pd.DataFrame(mean_sales)
+            print("mean_sales",mean_sales)
+            mean_sales = mean_sales[:1]
+            row_sales_item = filter_rows_by_value(sales, 'Item No.', item)
+            result = data_item_out_stock(mean_sales,df_item, item)
+            if result=="okay" and len(row_sales_item)>=2:
+                filtered_data = filter_rows_by_value(df_item, 'Item No.', item)
+                value = filtered_data.iloc[0]['Quantity on Hand']
+                if value in results:
+                    results[item].append([value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]])
+                else:
+                    results[item] = [value,mean_sales['ds'].iloc[0],mean_sales['yhat'].iloc[0],mean_sales['yhat_lower'].iloc[0],mean_sales['yhat_upper'].iloc[0]] 
 
     # Create an empty DataFrame with desired columns
     df = pd.DataFrame(columns=["item_number","Date" ,"Quantity on stock", "Sale Pred", "Min Sale Pred","Max Sale Pred"])
@@ -135,7 +145,7 @@ def all_item_out_of_stock_day(mean_sales,sales,df_item):
     # Iterate over the dictionary items and add rows to the DataFrame
     for key, values in results.items():
         if len(values) == 5:  # Assuming each list has quantity stock, sales pred, max and min sales pred
-            df = df._append({'item_number': key,'Date': values[1] ,'Quantity on stock': values[0], 'Sale Pred': values[2], 'Min Sale Pred': values[3],'Max Sale Pred': values[4] }, ignore_index=True)
+            df = df.append({'item_number': key,'Date': values[1] ,'Quantity on stock': values[0], 'Sale Pred': values[2], 'Min Sale Pred': values[3],'Max Sale Pred': values[4] }, ignore_index=True)
 
     return df
     
