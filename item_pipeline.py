@@ -149,7 +149,7 @@ def all_item_out_of_stock_day(sales,df_item):
     # Iterate over the dictionary items and add rows to the DataFrame
     for key, values in results.items():
         if len(values) == 5:  # Assuming each list has quantity stock, sales pred, max and min sales pred
-            df = df.append({'item_number': key,'Date': values[1] ,'Quantity on stock': values[0], 'Sale Pred': values[2], 'Min Sale Pred': values[3],'Max Sale Pred': values[4] }, ignore_index=True)
+            df = df._append({'item_number': key,'Date': values[1] ,'Quantity on stock': values[0], 'Sale Pred': values[2], 'Min Sale Pred': values[3],'Max Sale Pred': values[4] }, ignore_index=True)
 
     return df
     
