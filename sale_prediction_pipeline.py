@@ -148,12 +148,11 @@ def forcaste_sale_prophet_item(sales, column,item_number):
     if sale_forcast.empty or len(sale_forcast)==1:
         result = f"The item is out of stock, there is no trend data to predict sales"
         return result, False
-    else:
+    elif len(sale_forcast)>=2:
         sale_forcast = sale_forcast.groupby("Posting Date")['Quantity'].sum().reset_index()
         sale_forcast.set_index("Posting Date", inplace = True)
         y = sale_forcast["Quantity"].resample('M').sum()
         y = y.reset_index()
-        print(y)
 
         sale_forcast = y.rename(columns={'Posting Date': 'ds','Quantity': 'y'})
     
@@ -170,6 +169,35 @@ def forcaste_sale_prophet_item(sales, column,item_number):
         #mask = (result['ds'] > '2023-12-05 00:00:00') & (result['ds'] <= '2023-12-30 00:00:00')
         final = result.loc[mask]
         return final, fig
+
+def forcaste_sale_prophet_item1(sales, column,item_number):
+    sale_forcast = filter_rows_by_value(sales, column, item_number)
+    sale_forcast = sale_forcast[['Posting Date','Quantity']]
+    sale_forcast['Posting Date'] = pd.to_datetime(sale_forcast['Posting Date'])
+    if sale_forcast.empty or len(sale_forcast)==1:
+        result = f"The item is out of stock, there is no trend data to predict sales"
+        return result, False
+    elif len(sale_forcast)>=2:
+        sale_forcast = sale_forcast.groupby("Posting Date")['Quantity'].sum().reset_index()
+        sale_forcast.set_index("Posting Date", inplace = True)
+        y = sale_forcast["Quantity"].resample('M').sum()
+        y = y.reset_index()
+
+        sale_forcast = y.rename(columns={'Posting Date': 'ds','Quantity': 'y'})
+    
+        my_model = Prophet()
+        my_model.fit(sale_forcast)
+        future_dates = my_model.make_future_dataframe(periods=3, freq='M')
+        #future_dates = pd.DataFrame({'ds':['2023-12-06','2023-12-07','2023-12-08','2023-12-09','2023-12-10','2023-12-11','2023-12-12']})
+        forecast = my_model.predict(future_dates)
+        fig = plot_plotly(my_model, forecast) # This returns a plotly Figure
+        #py.iplot(fig)
+        result = forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+        result = result.sort_values(by='ds',ascending=True)
+        mask = (result['ds'] >= '2023-12-08 00:00:00' )
+        #mask = (result['ds'] > '2023-12-05 00:00:00') & (result['ds'] <= '2023-12-30 00:00:00')
+        final = result.loc[mask]
+        return final
     
       
     
