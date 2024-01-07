@@ -94,22 +94,26 @@ def data_item_out_stock1(sales,df_stock, item):
             return Date_out_stock.date()
         else:
             return "Item wont be out of stock during the week"
-    
+     
+        
 def data_item_out_stock(sales,df_stock, item):
+    #sales = pd.DataFrame(sales)
     data_stock = df_stock[['Item No.', 'Quantity on Hand']]
     filtered_data = filter_rows_by_value(data_stock, 'Item No.', item)
-    sales["sum"] = sales['yhat'].cumsum().round()
-    total_quantity_item = filtered_data.iloc[0]['Quantity on Hand']
-    if total_quantity_item <= 0: 
-        return f"The item {item} is already out of stock"
-    else:
-        #total_quantity_item= heapq.nsmallest(1, list(sales["sum"]), key=lambda x: abs(x-total_quantity_item1))[0]
-        if total_quantity_item<max(sales["sum"]):
-            #result = f"the item {item} will be out of stock during the week {sales['ds'].iloc[0]}"
-            return "okay"
+    #print("sales",sales)
+    if not isinstance(sales, str) and  not sales.empty:
+        sales["sum"] = sales['yhat'].cumsum().round()
+        total_quantity_item = filtered_data.iloc[0]['Quantity on Hand']
+        if total_quantity_item <= 0: 
+            return f"The item {item} is already out of stock"
         else:
-            result = f"The item {item} wont be out of stock during the week {sales['ds'].iloc[0]} and there are {total_quantity_item} item available"
-            return result   
+            #total_quantity_item= heapq.nsmallest(1, list(sales["sum"]), key=lambda x: abs(x-total_quantity_item1))[0]
+            if total_quantity_item<max(sales["sum"]):
+                #result = f"the item {item} will be out of stock during the week {sales['ds'].iloc[0]}"
+                return "okay"
+            else:
+                result = f"The item {item} wont be out of stock during the week {sales['ds'].iloc[0]} and there are {total_quantity_item} item available"
+                return result 
 
 
 @st.cache_data
