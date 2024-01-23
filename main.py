@@ -106,9 +106,9 @@ with container0:
 if button and 'executed_flag' not in st.session_state:
 
 
-    #all_item_out_stock = all_item_out_of_stock_day(df_sales,df_inventory)
-    #all_item_out_stock.to_csv('out_of_stock.csv', index=False) 
-    all_item_out_stock = pd.read_csv("out_of_stock.csv")
+    all_item_out_stock = all_item_out_of_stock_day(df_sales,df_inventory)
+    all_item_out_stock.to_csv('out_of_stock.csv', index=False) 
+    #all_item_out_stock = pd.read_csv("out_of_stock.csv")
     st.session_state.executed_flag = True
 
 
