@@ -192,7 +192,7 @@ if button:
     color: green;
     }}
     </style>
-    <p class="a">All items out of stock by day during the Month</p>
+    <p class="a">All items out of stock during the Month</p>
     """
     with container3:
         st.markdown(html_str1, unsafe_allow_html=True)
