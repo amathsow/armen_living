@@ -132,11 +132,7 @@ p.a {{
 <p class="a">All items out of stock by day during the week</p>
 """
 with container3:
-    with col5:
-        st.markdown(html_str, unsafe_allow_html=True)
-        st.dataframe(mean_sales[:7])
-    with col6:
-        st.markdown(html_str1, unsafe_allow_html=True)
-        st.dataframe(all_item_out_stock)
+    st.markdown(html_str1, unsafe_allow_html=True)
+    st.dataframe(all_item_out_stock,use_container_width=True)
 
 
