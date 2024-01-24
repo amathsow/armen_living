@@ -196,6 +196,6 @@ if button:
     """
     with container3:
         st.markdown(html_str1, unsafe_allow_html=True)
-        st.dataframe(all_item_out_stock)
+        st.dataframe(all_item_out_stock,use_container_width=True)
 
 
