@@ -98,7 +98,7 @@ container0 = st.container()
 col1, col2 = st.columns(2)
 with container0:
     with col1:
-        col1.metric(str(mean_sales['ds'].iloc[0]),"Total weekly sales", week_sales)
+        col1.metric(str(mean_sales['ds'].iloc[0]),"Total monthly sales", week_sales)
     with col2:
         col2.metric(x_axis, "Revenue", price_sale_item*week_sales)
 #all_item_out_stock = all_item_out_of_stock_day(mean_sales,df_inventory)
@@ -195,13 +195,7 @@ if button:
     <p class="a">All items out of stock by day during the Month</p>
     """
     with container3:
-        with col5:
-            st.markdown(html_str, unsafe_allow_html=True)
-            #mean_sales.drop(['yhat_lower', 'yhat_upper', 'sum'], axis=1)
-            st.dataframe(mean_sales,use_container_width=True)
-        with col6:
-
-            st.markdown(html_str1, unsafe_allow_html=True)
-            st.dataframe(all_item_out_stock)
+        st.markdown(html_str1, unsafe_allow_html=True)
+        st.dataframe(all_item_out_stock)
 
 
